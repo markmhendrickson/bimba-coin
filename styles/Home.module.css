@@ -47,9 +47,9 @@
 }
 
 .title {
-  margin: 0;
+  margin: 2rem 0 1em 0;
   line-height: 1.15;
-  font-size: 4rem;
+  font-size: 2rem;
 }
 
 .title,
@@ -62,6 +62,11 @@
   font-size: 1.5rem;
 }
 
+.photo {
+  border-radius: 50%;
+  max-width: 224px;
+}
+
 .code {
   background: #fafafa;
   border-radius: 5px;
@@ -69,6 +74,18 @@
   font-size: 1.1rem;
   font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
     Bitstream Vera Sans Mono, Courier New, monospace;
+}
+
+.button {
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(200deg, #EAB1A6, #BA6970);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-top: 1rem;
+  padding: 0.5rem 2rem;
 }
 
 .grid {
