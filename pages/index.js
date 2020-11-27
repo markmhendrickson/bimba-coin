@@ -15,7 +15,7 @@ export default function Home() {
     showBlockstackConnect({
       redirectTo: '/',
       finished: ({ userSession }) => {
-        console.log('yay!');
+        console.log('Authenticated!');
       },
       appDetails: {
         name: appName,
