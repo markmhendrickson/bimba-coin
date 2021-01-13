@@ -127,6 +127,7 @@ export default function Home() {
   async function poxInfo() {
     const poxInfo = await client.getPoxInfo();
     console.log(poxInfo);
+    return poxInfo;
   }
 
   async function coreInfo() {
@@ -219,6 +220,64 @@ export default function Home() {
     console.log(stackingStatus);
   }
 
+  function delegateStacking() {
+    let poxInfo = await this.poxInfo();
+    let contractAddress = poxInfo.contract_id.split('.')[0];
+    let contractName = poxInfo.contract_id.split('.')[1];
+
+    const coreInfo = await this.coreInfo();
+    const burnBlockHeight = coreInfo.burn_block_height + 3;
+
+    let options = {
+      contractAddress: contractAddress,
+      contractName: contractName,
+      functionName: 'delegate-stx',
+      functionArgs: [
+        "amount-ustx": "100000000000",
+        "delegate-to": contractAddress
+        "until-burn-ht": coreInfo.burn_block_height + 100,
+        "pox-addr": "1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3"
+      ],
+      appDetails: {
+        name: appName,
+        icon: window.location.origin + imagePath
+      },
+      finished: data => {
+        console.log(`delegateStacking finished. transaction ID: ${data.txId}, transaction raw: ${data.txRaw}`);
+      },
+    }
+
+    console.log('delegateStacking initiate', options);
+
+    openContractCall(options);
+  }
+
+  function revokeStacking() {
+    let poxInfo = await this.poxInfo();
+    let contractAddress = poxInfo.contract_id.split('.')[0];
+    let contractName = poxInfo.contract_id.split('.')[1];
+
+    const coreInfo = await this.coreInfo();
+    const burnBlockHeight = coreInfo.burn_block_height + 3;
+
+    let options = {
+      contractAddress: contractAddress,
+      contractName: contractName,
+      functionName: 'revoke-delegate-stx',
+      appDetails: {
+        name: appName,
+        icon: window.location.origin + imagePath
+      },
+      finished: data => {
+        console.log(`delegateStacking finished. transaction ID: ${data.txId}, transaction raw: ${data.txRaw}`);
+      },
+    }
+
+    console.log('delegateStacking initiate', options);
+
+    openContractCall(options);
+  }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -246,6 +305,8 @@ export default function Home() {
         <button className={styles.button} onClick={lockSTX}>lockSTX</button>
         <button className={styles.button} onClick={confirmLock}>confirmLock</button>
         <button className={styles.button} onClick={stackingStatus}>stackingStatus</button>
+        <button className={styles.button} onClick={delegateStacking}>delegateStacking</button>
+        <button className={styles.button} onClick={revokeStacking}>revokeStacking</button>
       </main>
     </div>
   )
