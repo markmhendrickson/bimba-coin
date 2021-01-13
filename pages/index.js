@@ -18,7 +18,6 @@ import {
   TransactionVersion,
 } from '@stacks/transactions';
 
-
 // generate random key or use an existing key
 const privateKey = privateKeyToString(makeRandomPrivKey());
 
@@ -104,6 +103,122 @@ export default function Home() {
     openContractCall(options);
   }
 
+  function getAddress() {
+    console.log(stxAddress);
+  }
+
+  function stackingInfo() {
+    // will Stacking be executed in the next cycle?
+    const stackingEnabledNextCycle = await client.isStackingEnabledNextCycle();
+    // true or false
+    console.log("will Stacking be executed in the next cycle?", stackingEnabledNextCycle);
+
+    // how long (in seconds) is a Stacking cycle?
+    const cycleDuration = await client.getCycleDuration();
+    // 120
+    console.log("how long (in seconds) is a Stacking cycle?", cycleDuration);
+
+    // how much time is left (in seconds) until the next cycle begins?
+    const secondsUntilNextCycle = await client.getSecondsUntilNextCycle();
+    // 600000
+    console.log("how much time is left (in seconds) until the next cycle begins?", secondsUntilNextCycle);
+  }
+
+  function poxInfo() {
+    const poxInfo = await client.getPoxInfo();
+    console.log(poxInfo);
+  }
+
+  function coreInfo() {
+    const coreInfo = await client.getCoreInfo();
+    console.log(coreInfo);
+    return coreInfo;
+  }
+
+  function targetBlocktime() {
+    const targetBlocktime = await client.getTargetBlockTime();
+    console.log(targetBlocktime);
+  }
+  
+  function hasMinimumSTX() {
+    const hasMinStxAmount = await client.hasMinimumStx();
+    console.log(hasMinStxAmount);
+  }
+
+  function stackingElegibility() {
+    // user supplied parameters
+    let btcAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
+    let numberOfCycles = 3;
+
+    const stackingEligibility = await client.canStack({
+      poxAddress: btcAddress,
+      cycles: numberOfCycles,
+    });
+
+    console.log(stackingEligibility);
+  }
+
+  function lockSTX() {
+    // set the amount to lock in microstacks
+    const amountMicroStx = new BN(100000000000);
+
+    // set the burnchain (BTC) block for stacking lock to start
+    // you can find the current burnchain block height from coreInfo above
+    // and adding 3 blocks to provide a buffer for transaction to confirm
+    const coreInfo = await this.coreInfo();
+    const burnBlockHeight = coreInfo.burn_block_height + 3;
+
+    // execute the stacking action by signing and broadcasting a transaction to the network
+    client
+      .stack({
+        amountMicroStx,
+        poxAddress: btcAddress,
+        cycles: numberOfCycles,
+        privateKey,
+        burnBlockHeight,
+      })
+      .then(response => {
+        // If successful, stackingResults will contain the txid for the Stacking transaction
+        // otherwise an error will be returned
+        if (response.hasOwnProperty('error')) {
+          console.log(response.error);
+          throw new Error('Stacking transaction failed');
+        } else {
+          console.log(`txid: ${response}`);
+          // txid: f6e9dbf6a26c1b73a14738606cb2232375d1b440246e6bbc14a45b3a66618481
+          return response;
+        }
+      });
+  }
+
+  function confirmLock() {
+    const { TransactionsApi } = require('@stacks/blockchain-api-client');
+    const tx = new TransactionsApi(apiConfig);
+
+    const waitForTransactionSuccess = txId =>
+      new Promise((resolve, reject) => {
+        const pollingInterval = 3000;
+        const intervalID = setInterval(async () => {
+          const resp = await tx.getTransactionById({ txId });
+          if (resp.tx_status === 'success') {
+            // stop polling
+            clearInterval(intervalID);
+            // update UI to display stacking status
+            return resolve(resp);
+          }
+        }, pollingInterval);
+      });
+
+    // note: txId should be defined previously
+    const resp = await waitForTransactionSuccess(txId);
+    console.log(resp);
+  }
+
+  function stackingStatus() {
+    const stackingStatus = await client.getStatus();
+    console.log(stackingStatus);
+  }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -121,6 +236,16 @@ export default function Home() {
         <button className={styles.button} onClick={getUserData}>getUserData</button>
         <button className={styles.button} onClick={deployContract}>deployContract</button>
         <button className={styles.button} onClick={callContract}>openContractCall</button>
+        <button className={styles.button} onClick={getAddress}>getAddress</button>
+        <button className={styles.button} onClick={stackingInfo}>stackingInfo</button>
+        <button className={styles.button} onClick={poxInfo}>poxInfo</button>
+        <button className={styles.button} onClick={coreInfo}>coreInfo</button>
+        <button className={styles.button} onClick={targetBlocktime}>targetBlocktime</button>
+        <button className={styles.button} onClick={hasMinimumSTX}>hasMinimumSTX</button>
+        <button className={styles.button} onClick={stackingElegibility}>stackingElegibility</button>
+        <button className={styles.button} onClick={lockSTX}>lockSTX</button>
+        <button className={styles.button} onClick={confirmLock}>confirmLock</button>
+        <button className={styles.button} onClick={stackingStatus}>stackingStatus</button>
       </main>
     </div>
   )
