@@ -107,7 +107,7 @@ export default function Home() {
     console.log(stxAddress);
   }
 
-  function stackingInfo() {
+  async function stackingInfo() {
     // will Stacking be executed in the next cycle?
     const stackingEnabledNextCycle = await client.isStackingEnabledNextCycle();
     // true or false
@@ -124,28 +124,28 @@ export default function Home() {
     console.log("how much time is left (in seconds) until the next cycle begins?", secondsUntilNextCycle);
   }
 
-  function poxInfo() {
+  async function poxInfo() {
     const poxInfo = await client.getPoxInfo();
     console.log(poxInfo);
   }
 
-  function coreInfo() {
+  async function coreInfo() {
     const coreInfo = await client.getCoreInfo();
     console.log(coreInfo);
     return coreInfo;
   }
 
-  function targetBlocktime() {
+  async function targetBlocktime() {
     const targetBlocktime = await client.getTargetBlockTime();
     console.log(targetBlocktime);
   }
   
-  function hasMinimumSTX() {
+  async function hasMinimumSTX() {
     const hasMinStxAmount = await client.hasMinimumStx();
     console.log(hasMinStxAmount);
   }
 
-  function stackingElegibility() {
+  async function stackingElegibility() {
     // user supplied parameters
     let btcAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
     let numberOfCycles = 3;
@@ -158,7 +158,7 @@ export default function Home() {
     console.log(stackingEligibility);
   }
 
-  function lockSTX() {
+  async function lockSTX() {
     // set the amount to lock in microstacks
     const amountMicroStx = new BN(100000000000);
 
@@ -191,7 +191,7 @@ export default function Home() {
       });
   }
 
-  function confirmLock() {
+  async function confirmLock() {
     const { TransactionsApi } = require('@stacks/blockchain-api-client');
     const tx = new TransactionsApi(apiConfig);
 
@@ -214,7 +214,7 @@ export default function Home() {
     console.log(resp);
   }
 
-  function stackingStatus() {
+  async function stackingStatus() {
     const stackingStatus = await client.getStatus();
     console.log(stackingStatus);
   }
