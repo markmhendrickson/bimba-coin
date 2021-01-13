@@ -18,6 +18,7 @@ import {
   TransactionVersion,
 } from '@stacks/transactions';
 
+
 // generate random key or use an existing key
 const privateKey = privateKeyToString(makeRandomPrivKey());
 
