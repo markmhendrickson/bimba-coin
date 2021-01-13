@@ -8,8 +8,11 @@
     "start": "next start"
   },
   "dependencies": {
-    "@stacks/auth": "^1.0.0-beta.13",
-    "blockstack": "^21.1.1",
+    "@stacks/connect": "^4.3.15",
+    "@stacks/network": "^1.0.0-beta.20",
+    "@stacks/stacking": "^1.0.0-beta.20",
+    "@stacks/transactions": "^1.0.0-beta.20",
+    "bn.js": "^5.1.3",
     "next": "10.0.3",
     "react": "17.0.1",
     "react-dom": "17.0.1"

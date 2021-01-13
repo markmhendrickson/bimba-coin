@@ -1,20 +1,43 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import { showBlockstackConnect } from '@stacks/connect';
-import { UserSession, AppConfig } from '@stacks/auth';
-import { openContractCall, openContractDeploy } from '@stacks/connect';
+import BN from 'bn.js';
+import { StackingClient } from '@stacks/stacking';
+import { StacksTestnet } from '@stacks/network';
 
-const appConfig = new AppConfig()
-const userSession = new UserSession({ appConfig })
+import { 
+  showConnect,
+  UserSession, 
+  AppConfig, 
+  openContractCall, 
+  openContractDeploy } from '@stacks/connect';
 
-let appName = "Bimba Coin"
-let imagePath = '/images/bimba.jpeg'
+import {
+  makeRandomPrivKey,
+  privateKeyToString,
+  getAddressFromPrivateKey,
+  TransactionVersion,
+} from '@stacks/transactions';
+
+// generate random key or use an existing key
+const privateKey = privateKeyToString(makeRandomPrivKey());
+
+// get Stacks address
+const stxAddress = getAddressFromPrivateKey(privateKey, TransactionVersion.Testnet);
+
+// instantiate the Stacker class for testnet
+const client = new StackingClient(stxAddress, new StacksTestnet());
+
+const appConfig = new AppConfig();
+const userSession = new UserSession({ appConfig });
+
+let appName = "Bimba Coin";
+let imagePath = '/images/bimba.jpeg';
 
 const contractName = 'hello-world'
 
 export default function Home() {
   function authenticate() {
-    showBlockstackConnect({
+    showConnect({
       redirectTo: '/',
       finished: ({ userSession }) => {
         console.log('Authenticated!');
