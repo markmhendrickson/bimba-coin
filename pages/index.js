@@ -1,8 +1,11 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import BN from 'bn.js';
-import { StackingClient } from '@stacks/stacking';
 import { StacksTestnet } from '@stacks/network';
+import {
+  standardPrincipalCV,
+  stringUtf8CV
+} from "@stacks/transactions";
 
 import { 
   showConnect,
@@ -24,14 +27,13 @@ const privateKey = privateKeyToString(makeRandomPrivKey());
 // get Stacks address
 const stxAddress = getAddressFromPrivateKey(privateKey, TransactionVersion.Testnet);
 
-// instantiate the Stacker class for testnet
-const client = new StackingClient(stxAddress, new StacksTestnet());
-
 const appConfig = new AppConfig();
 const userSession = new UserSession({ appConfig });
 
 let appName = "Bimba Coin";
 let imagePath = '/images/bimba.jpeg';
+
+let creatorAddress = 'STG6XHZVNEEXTCDX634RGDHJ8X1R5C1VYHZ4Z1DA';
 
 const contractName = 'hello-world'
 
@@ -82,12 +84,13 @@ export default function Home() {
     openContractDeploy(options);
   }
 
-  function callContract() {
+  function submitTweet() {
     let options = {
-      contractAddress: userSession.loadUserData().profile.stxAddress,
-      contractName: contractName,
-      functionName: 'hello',
+      contractAddress: creatorAddress,
+      contractName: 'bimba',
+      functionName: 'submit-tweet',
       functionArgs: [
+        stringUtf8CV(document.getElementById("tweet-url").value)
       ],
       appDetails: {
         name: appName,
@@ -103,6 +106,50 @@ export default function Home() {
     openContractCall(options);
   }
 
+  function grantToRecipient() {
+    let options = {
+      contractAddress: creatorAddress,
+      contractName: 'bimba',
+      functionName: 'grant-to-recipient',
+      functionArgs: [
+        standardPrincipalCV(document.getElementById("recipient-address").value)
+      ],
+      appDetails: {
+        name: appName,
+        icon: window.location.origin + imagePath
+      },
+      finished: data => {
+        console.log(`openContractCall finished. transaction ID: ${data.txId}, transaction raw: ${data.txRaw}`);
+      },
+    }
+
+    console.log('openContractCall initiate', options);
+
+    openContractCall(options);
+  }
+
+  let content, admin;
+
+  if (userSession.isUserSignedIn()) {
+    content = (
+      <div>
+        <input type="text" placeholder="Tweet URL" id="tweet-url" />
+        <button className={styles.button} onClick={submitTweet}>Submit Tweet</button>
+      </div>
+    )
+
+    if(userSession.loadUserData().profile.stxAddress.testnet == creatorAddress) {
+      admin = (
+        <div>
+          <input type="text" placeholder="Recipient address" id="recipient-address" />
+          <button className={styles.button} onClick={grantToRecipient}>Grant $BIMBA</button>
+        </div>
+      )
+    }
+  } else {
+    content = <button className={styles.button} onClick={authenticate}>authenticate</button>
+  }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -115,11 +162,8 @@ export default function Home() {
         <h1 className={styles.title}>
           {appName}
         </h1>
-        <button className={styles.button} onClick={authenticate}>authenticate</button>
-        <button className={styles.button} onClick={isUserSignedIn}>isUserSignedIn</button>
-        <button className={styles.button} onClick={getUserData}>getUserData</button>
-        <button className={styles.button} onClick={deployContract}>deployContract</button>
-        <button className={styles.button} onClick={callContract}>openContractCall</button>
+        {content}
+        {admin}
       </main>
     </div>
   )

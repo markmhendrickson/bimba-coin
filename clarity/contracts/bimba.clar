@@ -2,9 +2,8 @@
 (define-fungible-token bimba u1000000)
 (define-constant contract-creator tx-sender)
 (define-data-var token-uri (optional (string-utf8 256)) none)
-(define-map tweets { submitter: principal } { url: (string-utf8 256) })
 
-(ft-mint? bimba u1000 contract-creator)
+(ft-mint? bimba u10000 contract-creator)
 ;; add mint for other contributors
 
 (define-public (transfer (to principal) (amount uint)) 
@@ -44,8 +43,22 @@
 
 (define-public (submit-tweet (url (string-utf8 256)))
   (begin
-    (map-set tweets { submitter: tx-sender } { url: url })
+    (print { type: "submission", action: "created", data: { submitter: tx-sender, url: url } })
     (ok url)))
 
-(define-read-only (get-tweets)
-  (ok "foo"))
+(define-public (grant-to-recipients (recipients (list 100 principal)))
+  (begin
+    (map grant-to-recipient recipients)
+    (ok u0)))
+
+(define-public (grant-to-recipient (recipient principal))
+  (if 
+    (is-eq tx-sender contract-creator) 
+      (ok (ft-mint? bimba u1 recipient)) 
+    (err ERR-UNAUTHORIZED)))
+
+(define-public (grant-to-recipient-amount (recipient principal) (amount uint))
+  (if 
+    (is-eq tx-sender contract-creator) 
+      (ok (ft-mint? bimba amount recipient)) 
+    (err ERR-UNAUTHORIZED)))
