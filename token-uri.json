@@ -1,0 +1,18 @@
+{
+  "title": "Bimba Coin ($BIMBA)",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Bimba Coin"
+    },
+    "description": {
+      "type": "string",
+      "description": "$BIMBA holders are a community of Bimba lovers with the right to propose and bid on super rare Bimba NFTs."
+    },
+    "image": {
+      "type": "string",
+      "description": ""
+    }
+  }
+}
