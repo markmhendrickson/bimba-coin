@@ -1,8 +1,20 @@
+@font-face {
+  font-family: Bellevier;
+  src: url(https://uploads-ssl.webflow.com/609016dc18c58d56d9cbc7cc/6092b67d6f53dcd62c624d3c_Bevellier-Regular.ttf);
+}
+
+@font-face {
+  font-family: Inter;
+  src: url(https://fonts.gstatic.com/s/inter/v3/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff);
+}
+
 html,
 body {
+	background: #7C3E8D;
   padding: 0;
   margin: 0;
   font-family: system-ui;
+  text-align: center;
 }
 
 a {
@@ -12,4 +24,12 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+p {
+	font-family: Inter;
+	color: white;
+	text-align: center;
+	font-size: 1.5em;
+	max-width: 800px;
 }

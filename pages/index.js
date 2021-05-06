@@ -7,6 +7,9 @@ import {
   stringUtf8CV
 } from "@stacks/transactions";
 
+import { Tweet } from 'react-twitter-widgets';
+import { useRouter } from 'next/router'
+
 import { 
   showConnect,
   UserSession, 
@@ -30,7 +33,7 @@ const stxAddress = getAddressFromPrivateKey(privateKey, TransactionVersion.Testn
 const appConfig = new AppConfig();
 const userSession = new UserSession({ appConfig });
 
-let appName = "Bimba Coin";
+let appName = "BimbaCoin";
 let imagePath = '/images/bimba.jpeg';
 
 let creatorAddress = 'STG6XHZVNEEXTCDX634RGDHJ8X1R5C1VYHZ4Z1DA';
@@ -38,11 +41,13 @@ let creatorAddress = 'STG6XHZVNEEXTCDX634RGDHJ8X1R5C1VYHZ4Z1DA';
 const contractName = 'hello-world'
 
 export default function Home() {
+  const router = useRouter()
+
   function authenticate() {
     showConnect({
       redirectTo: '/',
       finished: ({ userSession }) => {
-        console.log('Authenticated!');
+        location.reload();
       },
       appDetails: {
         name: appName,
@@ -90,14 +95,14 @@ export default function Home() {
       contractName: 'bimba',
       functionName: 'submit-tweet',
       functionArgs: [
-        stringUtf8CV(document.getElementById("tweet-url").value)
+        stringUtf8CV(router.query.tweet_url)
       ],
       appDetails: {
         name: appName,
         icon: window.location.origin + imagePath
       },
       finished: data => {
-        console.log(`openContractCall finished. transaction ID: ${data.txId}, transaction raw: ${data.txRaw}`);
+        window.location.href = window.location.href += '&submitted-tweet=true';
       },
     }
 
@@ -128,17 +133,24 @@ export default function Home() {
     openContractCall(options);
   }
 
-  let content, admin;
+  let tweet, content, admin;
 
   if (userSession.isUserSignedIn()) {
-    content = (
-      <div>
-        <input type="text" placeholder="Tweet URL" id="tweet-url" />
-        <button className={styles.button} onClick={submitTweet}>Submit Tweet</button>
-      </div>
-    )
+    if (!router.query['submitted-tweet']) {
+      content = (
+        <div>
+          <button className={styles.button} onClick={submitTweet}>Submit Tweet</button>
+        </div>
+      )
+    } else {
+      content = (
+        <div>
+          <p>Your tweet has been submitted! We'll follow up on Twitter when we've approved your submission and sent you $BIMBA Coin. 🚀</p>
+        </div>
+      )
+    }
 
-    if(userSession.loadUserData().profile.stxAddress.testnet == creatorAddress) {
+    if(false && userSession.loadUserData().profile.stxAddress.testnet == creatorAddress) {
       admin = (
         <div>
           <input type="text" placeholder="Recipient address" id="recipient-address" />
@@ -147,7 +159,18 @@ export default function Home() {
       )
     }
   } else {
-    content = <button className={styles.button} onClick={authenticate}>authenticate</button>
+    content = (
+      <div>
+        <p>Install and authenticate with the Stacks Wallet browser extension to submit your tweet.</p>
+        <button className={styles.button} onClick={authenticate}>Get Started</button>
+      </div>
+    )
+  }
+
+  if (router.query.tweet_url) {
+    let tweetId = router.query.tweet_url.split('/').pop();
+    console.log(tweetId);
+    tweet = <Tweet class="tweet" tweetId={tweetId} />
   }
 
   return (
@@ -158,10 +181,7 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <img src={imagePath} className={styles.photo} />
-        <h1 className={styles.title}>
-          {appName}
-        </h1>
+        {tweet}
         {content}
         {admin}
       </main>

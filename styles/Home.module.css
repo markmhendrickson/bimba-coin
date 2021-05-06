@@ -77,10 +77,12 @@
 }
 
 .button {
+  font-family: Bellevier;
+  font-size: 24px;
+  text-transform: uppercase;
   border: none;
   border-radius: 16px;
-  background: linear-gradient(200deg, #EAB1A6, #BA6970);
-  color: white;
+  background: #C4FC5A;
   cursor: pointer;
   font-weight: 600;
   letter-spacing: 1px;
